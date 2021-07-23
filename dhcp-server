@@ -1,0 +1,6 @@
+/ip dhcp-server
+add address-pool=Pool1 disabled=no interface=bridge1 lease-time=1h name=dhcp1
+/ip dhcp-server network
+add address=192.168.100.0/24 comment="hotspot network" gateway=192.168.100.1
+
+

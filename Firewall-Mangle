@@ -1,0 +1,37 @@
+/ip firewall mangle
+add action=mark-connection chain=prerouting comment=private-lokal dst-address-list=private-lokal new-connection-mark=private-lokal passthrough=yes src-address-list=private-lokal
+add action=accept chain=prerouting comment=private-lokal connection-mark=private-lokal dst-address-list=private-lokal src-address-list=private-lokal
+add action=mark-connection chain=prerouting comment=vip dst-address-list=!private-lokal new-connection-mark=vip passthrough=yes protocol=icmp src-address-list=private-lokal
+add action=mark-connection chain=prerouting comment=dns dst-address-list=!private-lokal dst-port=53,5353,123,1194 new-connection-mark=vip passthrough=yes protocol=tcp src-address-list=private-lokal
+add action=mark-connection chain=prerouting comment=dns dst-address-list=!private-lokal dst-port=53,5353,123,1194 new-connection-mark=vip passthrough=yes protocol=udp src-address-list=private-lokal
+add action=accept chain=prerouting comment=vip connection-mark=vip
+add action=mark-connection chain=prerouting comment=games dst-address-list=games new-connection-mark=games passthrough=yes src-address-list=private-lokal
+add action=accept chain=prerouting comment=games connection-mark=games
+add action=mark-connection chain=prerouting comment=sosmed dst-address-list=sosmed new-connection-mark=sosmed passthrough=yes src-address-list=private-lokal
+add action=accept chain=prerouting comment=sosmed connection-mark=sosmed
+add action=mark-connection chain=prerouting comment=ggc-telkom dst-address-list=ggc-telkom new-connection-mark=ggc-redirector passthrough=yes src-address-list=private-lokal
+add action=accept chain=prerouting comment=ggc-redirector connection-mark=ggc-redirector
+add action=mark-connection chain=prerouting comment=all-trafik dst-address-list=!private-lokal new-connection-mark=all-trafik passthrough=yes src-address-list=private-lokal
+add action=accept chain=prerouting comment=all-trafik connection-mark=all-trafik
+add action=jump chain=forward in-interface=ether1 jump-target=qos-down
+add action=mark-packet chain=qos-down comment=vip-down connection-mark=vip new-packet-mark=vip-down passthrough=no
+add action=mark-packet chain=qos-down comment=games-down connection-mark=games new-packet-mark=games-down passthrough=no
+add action=mark-packet chain=qos-down comment=sosmed-down connection-mark=sosmed new-packet-mark=sosmed-down passthrough=no
+add action=mark-packet chain=qos-down comment=ggc-telkom-down connection-mark=ggc-redirector new-packet-mark=ggc-telkom-down passthrough=no
+add action=mark-packet chain=qos-down comment=browsing-down connection-bytes=0-1000000 connection-mark=all-trafik new-packet-mark=browsing-down passthrough=no
+add action=mark-packet chain=qos-down comment=midle-down connection-bytes=1000001-3000000 connection-mark=all-trafik new-packet-mark=midle-down passthrough=no
+add action=mark-packet chain=qos-down comment=high-down connection-bytes=3000001-1000000000 connection-mark=all-trafik new-packet-mark=high-down passthrough=no
+add action=mark-packet chain=qos-down comment=unknown-down connection-mark=all-trafik new-packet-mark=unknown-down passthrough=no
+add action=mark-packet chain=qos-down comment=unknown-down new-packet-mark=unknown-down passthrough=no
+add action=return chain=qos-down
+add action=jump chain=forward jump-target=qos-up out-interface=ether1
+add action=mark-packet chain=qos-up comment=vip-up connection-mark=vip new-packet-mark=vip-up passthrough=no
+add action=mark-packet chain=qos-up comment=games-up connection-mark=games new-packet-mark=games-up passthrough=no
+add action=mark-packet chain=qos-up comment=sosmed-up connection-mark=sosmed new-packet-mark=sosmed-up passthrough=no
+add action=mark-packet chain=qos-up comment=ggc-telkom-up connection-mark=ggc-redirector new-packet-mark=ggc-telkom-up passthrough=no
+add action=mark-packet chain=qos-up comment=browsing-up connection-bytes=0-500000 connection-mark=all-trafik new-packet-mark=browsing-up passthrough=no
+add action=mark-packet chain=qos-up comment=midle-up connection-bytes=501000-1500000 connection-mark=all-trafik new-packet-mark=midle-up passthrough=no
+add action=mark-packet chain=qos-up comment=high-up connection-bytes=1500001-1000000000 connection-mark=all-trafik new-packet-mark=high-up passthrough=no
+add action=mark-packet chain=qos-up comment=unknown-up connection-mark=all-trafik new-packet-mark=unknown-up passthrough=no
+add action=mark-packet chain=qos-up comment=unknown-up new-packet-mark=unknown-up passthrough=no
+add action=return chain=qos-up

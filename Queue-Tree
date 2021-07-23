@@ -1,0 +1,21 @@
+/queue tree
+add max-limit=3M name=DOWNLOAD parent=global queue=default
+add bucket-size=0 limit-at=64k max-limit=3M name=1.VIP packet-mark=vip-down parent=DOWNLOAD priority=1 queue=default
+add bucket-size=0 limit-at=500k max-limit=3M name=2.GAMES packet-mark=games-down parent=DOWNLOAD priority=3 queue=default
+add limit-at=512k max-limit=3M name=3.NORMAL parent=DOWNLOAD queue=default
+add limit-at=1M max-limit=3M name=3.2.BROWSING packet-mark=browsing-down  parent=3.NORMAL priority=5 queue=pcq-download-default
+add limit-at=1M max-limit=3M name=3.3.MIDDLE packet-mark=midle-down parent=3.NORMAL priority=7 queue=pcq-download-default
+add limit-at=1M max-limit=3M name=3.4.HIGH packet-mark=high-down parent=3.NORMAL queue=pcq-download-default
+add limit-at=1M max-limit=3M name=3.5.UNKNOWN packet-mark=unknown-down parent=3.NORMAL queue=pcq-download-default
+add limit-at=1M max-limit=3M name=4.GOOGLE packet-mark=ggc-telkom-down parent=DOWNLOAD queue=pcq-download-default
+add max-limit=3M name=UPLOAD parent=global queue=default
+add limit-at=64k max-limit=3M name=1.U-VIP packet-mark=vip-up parent=UPLOAD priority=1 queue=default
+add limit-at=500k max-limit=3M name=2.U-GAMES packet-mark=games-up parent=UPLOAD priority=3 queue=default
+add limit-at=1500k max-limit=2M name=3.U-NORMAL parent=UPLOAD queue=default
+add limit-at=200k max-limit=2M name=3.2.U-BROWSING packet-mark=browsing-up parent=3.U-NORMAL priority=5 queue=pcq-upload-default
+add limit-at=200k max-limit=2M name=3.3.U-MIDDLE packet-mark=midle-up parent=3.U-NORMAL priority=7 queue=pcq-upload-default
+add limit-at=200k max-limit=2M name=3.4.U-HIGH packet-mark=high-up parent=3.U-NORMAL queue=pcq-upload-default
+add limit-at=200k max-limit=2M name=3.5.U-UNKNOWN packet-mark=unknown-up parent=3.U-NORMAL queue=pcq-upload-default
+add limit-at=200k max-limit=2M name=4.U-GOOGLE packet-mark=ggc-telkom-up parent=UPLOAD queue=pcq-upload-default
+add limit-at=1M max-limit=3M name=3.1.SOSMED packet-mark=sosmed-down parent=3.NORMAL priority=5 queue=pcq-download-default
+add limit-at=200k max-limit=2M name=3.1.U-SOSMED packet-mark=sosmed-up parent=3.U-NORMAL priority=5 queue=pcq-upload-default
